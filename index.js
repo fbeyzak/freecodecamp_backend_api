@@ -30,3 +30,41 @@ app.get("/api/hello", function (req, res) {
 var listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
 });
+
+
+
+const getDateData = (dateObj) => {
+  return {
+    unix: dateObj.getTime(),
+    utc: dateObj.toUTCString()
+  }
+}
+
+app.get('/api/', (req, res) => {
+  // Handle the case where no date is provided
+  res.status(200).json(getDateData(new Date()));
+});
+app.get('/api/:date' , (req , res) => {
+  try {
+    const {date} = req.params;
+    let dateObj;
+
+      // check if the date value is a number ;
+      const dateNumber = new Number(date);
+      // if it is a number use number if not use string
+      const dateToUse = isNaN(dateNumber) ? date : dateNumber 
+      // create a new date object
+      dateObj = new Date(dateToUse);
+
+      if(isNaN(dateObj)){
+        return res.status(500).json({ error : "Invalid Date" })
+      }
+      else {
+        res.status(200).json(getDateData(dateObj))
+    
+      }
+
+  }catch(err){
+    res.status(500).json({ error : err })
+  }
+})
